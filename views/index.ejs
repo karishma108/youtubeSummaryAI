@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="url"], select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="url"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .results h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .summary-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .keyword {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .transcript-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Video Transcript Scraper</h1>
+            <p>Extract transcripts and generate intelligent summaries from YouTube videos</p>
+        </div>
+
+        <div class="form-container">
+            <form id="scraperForm">
+                <div class="form-group">
+                    <label for="videoUrl">YouTube Video URL</label>
+                    <input type="url" id="videoUrl" name="videoUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="summaryLength">Summary Length (sentences)</label>
+                        <select id="summaryLength" name="summaryLength">
+                            <option value="3">3 sentences</option>
+                            <option value="5" selected>5 sentences</option>
+                            <option value="7">7 sentences</option>
+                            <option value="10">10 sentences</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="summaryMethod">Summary Method</label>
+                        <select id="summaryMethod" name="summaryMethod">
+                            <option value="frequency" selected>Frequency-based</option>
+                            <option value="position">Position-based</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeKeywords" name="includeKeywords" checked>
+                        <label for="includeKeywords">Include keyword extraction</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    🚀 Extract & Summarize
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing video transcript...</p>
+            </div>
+
+            <div class="results" id="results">
+                <div class="stats" id="stats"></div>
+                
+                <h3>📋 Summary</h3>
+                <div class="summary-box" id="summaryBox"></div>
+
+                <h3>🔍 Keywords</h3>
+                <div class="keywords" id="keywords"></div>
+
+                <h3>📜 Transcript Preview</h3>
+                <div class="transcript-preview" id="transcriptPreview"></div>
+            </div>
+
+            <div class="error" id="error" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('scraperForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const errorDiv = document.getElementById('error');
+            
+            // Reset UI
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            errorDiv.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            try {
+                const formData = new FormData(e.target);
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                    results.style.display = 'block';
+                } else {
+                    throw new Error(data.error || 'Failed to process video');
+                }
+                
+            } catch (error) {
+                errorDiv.textContent = '❌ Error: ' + error.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function displayResults(data) {
+            // Stats
+            const stats = document.getElementById('stats');
+            const methodBadge = data.method === 'backup' ? ' 🔧 (Backup Method)' : '';
+            stats.innerHTML = `
+                <div class="stat">
+                    <div class="stat-value">${data.duration}</div>
+                    <div class="stat-label">Duration</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${data.transcript.wordCount}</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${data.summary.confidence}%</div>
+                    <div class="stat-label">Confidence</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${data.summary.compressionRatio}${methodBadge}</div>
+                    <div class="stat-label">Method</div>
+                </div>
+            `;
+            
+            // Summary
+            const summaryBox = document.getElementById('summaryBox');
+            summaryBox.innerHTML = data.summary.text;
+            
+            // Show title if available (from backup method)
+            if (data.title) {
+                const titleDiv = document.createElement('div');
+                titleDiv.style.cssText = 'background: #e8f4ff; padding: 10px; margin-bottom: 15px; border-radius: 5px; border-left: 4px solid #007bff;';
+                titleDiv.innerHTML = `<strong>📺 Video Title:</strong> ${data.title}`;
+                summaryBox.parentNode.insertBefore(titleDiv, summaryBox);
+            }
+            
+            // Keywords
+            const keywords = document.getElementById('keywords');
+            if (data.keywords && data.keywords.length > 0) {
+                keywords.innerHTML = data.keywords.map(kw => 
+                    `<span class="keyword">${kw.word} (${kw.frequency})</span>`
+                ).join('');
+            } else {
+                keywords.innerHTML = '<em>Keywords not available for this method</em>';
+            }
+            
+            // Transcript preview
+            const preview = data.transcript.full.substring(0, 500) + '...';
+            document.getElementById('transcriptPreview').textContent = preview;
+        }
+    </script>
+</body>
+</html>
